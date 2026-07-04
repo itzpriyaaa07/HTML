@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUD Using Open API</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    padding:20px;
+    background:#f4f4f4;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h2{
+    text-align:center;
+}
+
+input{
+    padding:10px;
+    margin:5px;
+    width:250px;
+}
+
+button{
+    padding:10px 15px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#333;
+    color:white;
+}
+
+.edit-btn{
+    background:orange;
+    border:none;
+    color:white;
+}
+
+.delete-btn{
+    background:red;
+    border:none;
+    color:white;
+}
+
+.add-btn{
+    background:green;
+    color:white;
+    border:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>User CRUD Operations</h2>
+
+<input type="text" id="name" placeholder="Enter Name">
+<input type="email" id="email" placeholder="Enter Email">
+<button class="add-btn" onclick="addUser()">Add User</button>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="userTable"></tbody>
+</table>
+
+</div>
+
+<script>
+
+const API_URL = "https://jsonplaceholder.typicode.com/users";
+
+let users = [];
+let editingId = null;
+
+// READ (GET)
+async function loadUsers() {
+    try{
+        const response = await fetch(API_URL);
+        users = await response.json();
+
+        // Show only first 10 users
+        users = users.slice(0,10);
+
+        displayUsers();
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+function displayUsers(){
+
+    const table = document.getElementById("userTable");
+
+    table.innerHTML = "";
+
+    users.forEach(user => {
+
+        table.innerHTML += `
+        <tr>
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>
+                <button class="edit-btn"
+                onclick="editUser(${user.id})">
+                Edit
+                </button>
+
+                <button class="delete-btn"
+                onclick="deleteUser(${user.id})">
+                Delete
+                </button>
+            </td>
+        </tr>
+        `;
+    });
+}
+
+// CREATE (POST)
+async function addUser(){
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    if(name === "" || email === ""){
+        alert("Please fill all fields");
+        return;
+    }
+
+    if(editingId){
+
+        await updateUser(editingId,name,email);
+        return;
+    }
+
+    const newUser = {
+        name:name,
+        email:email
+    };
+
+    try{
+
+        const response = await fetch(API_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(newUser)
+        });
+
+        const data = await response.json();
+
+        data.id = users.length + 1;
+
+        users.push(data);
+
+        displayUsers();
+
+        document.getElementById("name").value="";
+        document.getElementById("email").value="";
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+// EDIT
+function editUser(id){
+
+    const user = users.find(u => u.id === id);
+
+    document.getElementById("name").value = user.name;
+    document.getElementById("email").value = user.email;
+
+    editingId = id;
+}
+
+// UPDATE (PUT)
+async function updateUser(id,name,email){
+
+    const updatedUser = {
+        id,
+        name,
+        email
+    };
+
+    try{
+
+        await fetch(`${API_URL}/${id}`,{
+            method:"PUT",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(updatedUser)
+        });
+
+        users = users.map(user =>
+            user.id === id ? updatedUser : user
+        );
+
+        displayUsers();
+
+        editingId = null;
+
+        document.getElementById("name").value="";
+        document.getElementById("email").value="";
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+// DELETE
+async function deleteUser(id){
+
+    try{
+
+        await fetch(`${API_URL}/${id}`,{
+            method:"DELETE"
+        });
+
+        users = users.filter(user => user.id !== id);
+
+        displayUsers();
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+// Initial Load
+loadUsers();
+
+</script>
+
+</body>
+</html>

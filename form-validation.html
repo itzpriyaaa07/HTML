@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Student Registration Form</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.error{
+    color: red;
+    font-size: 14px;
+}
+
+input, textarea, select{
+    padding: 5px;
+    margin-top: 5px;
+}
+
+input[type="submit"]{
+    padding: 8px 15px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Student Registration Form</h2>
+
+<form onsubmit="return validateForm();">
+
+<label>Name:</label><br>
+<input type="text" id="name">
+<span class="error" id="nameError"></span>
+<br><br>
+
+<label>Email:</label><br>
+<input type="email" id="email">
+<span class="error" id="emailError"></span>
+<br><br>
+
+<label>Password:</label><br>
+<input type="password" id="password">
+<span class="error" id="passwordError"></span>
+<br><br>
+
+<label>Address:</label><br>
+<textarea id="address" rows="4" cols="30"></textarea>
+<span class="error" id="addressError"></span>
+<br><br>
+
+<label>Gender:</label><br>
+<input type="radio" name="gender" value="Male"> Male
+<input type="radio" name="gender" value="Female"> Female
+<span class="error" id="genderError"></span>
+<br><br>
+
+<label>Country:</label><br>
+<select id="country">
+    <option value="">Select Country</option>
+    <option>India</option>
+    <option>USA</option>
+    <option>UK</option>
+    <option>Canada</option>
+</select>
+<span class="error" id="countryError"></span>
+<br><br>
+
+<label>Nationality:</label><br>
+<input type="text" id="nationality">
+<span class="error" id="nationalityError"></span>
+<br><br>
+
+<label>Phone Number:</label><br>
+<input type="text" id="phone">
+<span class="error" id="phoneError"></span>
+<br><br>
+
+<label>Date of Birth:</label><br>
+<input type="date" id="dob">
+<span class="error" id="dobError"></span>
+<br><br>
+
+<input type="submit" value="Submit">
+
+</form>
+
+<script>
+function validateForm(){
+
+document.querySelectorAll(".error").forEach(function(e){
+    e.innerHTML = "";
+});
+
+let valid = true;
+
+let name = document.getElementById("name").value.trim();
+let email = document.getElementById("email").value.trim();
+let password = document.getElementById("password").value.trim();
+let address = document.getElementById("address").value.trim();
+let country = document.getElementById("country").value;
+let nationality = document.getElementById("nationality").value.trim();
+let phone = document.getElementById("phone").value.trim();
+let dob = document.getElementById("dob").value;
+let gender = document.querySelector('input[name="gender"]:checked');
+
+if(name === ""){
+    document.getElementById("nameError").innerHTML = "Enter Name";
+    valid = false;
+}
+else if(!/^[A-Za-z ]+$/.test(name)){
+    document.getElementById("nameError").innerHTML =
+    "Name should contain only letters";
+    valid = false;
+}
+
+if(email === ""){
+    document.getElementById("emailError").innerHTML = "Enter Email";
+    valid = false;
+}
+else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    document.getElementById("emailError").innerHTML =
+    "Enter valid Email";
+    valid = false;
+}
+
+if(password === ""){
+    document.getElementById("passwordError").innerHTML =
+    "Enter Password";
+    valid = false;
+}
+else if(password.length < 8){
+    document.getElementById("passwordError").innerHTML =
+    "Password must contain at least 8 characters";
+    valid = false;
+}
+
+if(address === ""){
+    document.getElementById("addressError").innerHTML =
+    "Enter Address";
+    valid = false;
+}
+
+if(!gender){
+    document.getElementById("genderError").innerHTML =
+    "Select Gender";
+    valid = false;
+}
+
+if(country === ""){
+    document.getElementById("countryError").innerHTML =
+    "Select Country";
+    valid = false;
+}
+
+if(nationality === ""){
+    document.getElementById("nationalityError").innerHTML =
+    "Enter Nationality";
+    valid = false;
+}
+else if(!/^[A-Za-z ]+$/.test(nationality)){
+    document.getElementById("nationalityError").innerHTML =
+    "Nationality should contain only letters";
+    valid = false;
+}
+
+if(phone === ""){
+    document.getElementById("phoneError").innerHTML =
+    "Enter Phone Number";
+    valid = false;
+}
+else if(!/^[0-9]{10}$/.test(phone)){
+    document.getElementById("phoneError").innerHTML =
+    "Enter valid 10 digit phone number";
+    valid = false;
+}
+
+if(dob === ""){
+    document.getElementById("dobError").innerHTML =
+    "Select DOB";
+    valid = false;
+}
+
+if(valid){
+    alert("Form Submitted Successfully!");
+    document.querySelector("form").reset();
+}
+
+return valid;
+}
+</script>
+
+</body>
+</html>
